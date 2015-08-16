@@ -15,6 +15,10 @@
 		FF2B180F1B7B20B100F00719 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF2B180E1B7B20B100F00719 /* Images.xcassets */; };
 		FF2B18121B7B20B100F00719 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = FF2B18101B7B20B100F00719 /* LaunchScreen.xib */; };
 		FF2B181E1B7B20B100F00719 /* NotesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FF2B181D1B7B20B100F00719 /* NotesTests.m */; };
+		FF2B18581B80F43000F00719 /* MGSwipeButton.m in Sources */ = {isa = PBXBuildFile; fileRef = FF2B18551B80F43000F00719 /* MGSwipeButton.m */; };
+		FF2B18591B80F43000F00719 /* MGSwipeTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FF2B18571B80F43000F00719 /* MGSwipeTableCell.m */; };
+		FF2B185B1B81004300F00719 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF2B185A1B81004300F00719 /* DropboxSDK.framework */; };
+		FF2B185E1B8110E000F00719 /* EditorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FF2B185D1B8110E000F00719 /* EditorViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +46,13 @@
 		FF2B18171B7B20B100F00719 /* NotesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NotesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF2B181C1B7B20B100F00719 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FF2B181D1B7B20B100F00719 /* NotesTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NotesTests.m; sourceTree = "<group>"; };
+		FF2B18541B80F43000F00719 /* MGSwipeButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGSwipeButton.h; sourceTree = "<group>"; };
+		FF2B18551B80F43000F00719 /* MGSwipeButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGSwipeButton.m; sourceTree = "<group>"; };
+		FF2B18561B80F43000F00719 /* MGSwipeTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGSwipeTableCell.h; sourceTree = "<group>"; };
+		FF2B18571B80F43000F00719 /* MGSwipeTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGSwipeTableCell.m; sourceTree = "<group>"; };
+		FF2B185A1B81004300F00719 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DropboxSDK.framework; path = Notes/DropboxSDK.framework; sourceTree = "<group>"; };
+		FF2B185C1B8110E000F00719 /* EditorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorViewController.h; sourceTree = "<group>"; };
+		FF2B185D1B8110E000F00719 /* EditorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditorViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF2B185B1B81004300F00719 /* DropboxSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +77,7 @@
 		FF2B17F21B7B20B100F00719 = {
 			isa = PBXGroup;
 			children = (
+				FF2B185A1B81004300F00719 /* DropboxSDK.framework */,
 				FF2B17FD1B7B20B100F00719 /* Notes */,
 				FF2B181A1B7B20B100F00719 /* NotesTests */,
 				FF2B17FC1B7B20B100F00719 /* Products */,
@@ -83,10 +96,13 @@
 		FF2B17FD1B7B20B100F00719 /* Notes */ = {
 			isa = PBXGroup;
 			children = (
+				FF2B18531B80F3FA00F00719 /* MGSwipeTableCell */,
 				FF2B18021B7B20B100F00719 /* AppDelegate.h */,
 				FF2B18031B7B20B100F00719 /* AppDelegate.m */,
 				FF2B18081B7B20B100F00719 /* ViewController.h */,
 				FF2B18091B7B20B100F00719 /* ViewController.m */,
+				FF2B185C1B8110E000F00719 /* EditorViewController.h */,
+				FF2B185D1B8110E000F00719 /* EditorViewController.m */,
 				FF2B180B1B7B20B100F00719 /* Main.storyboard */,
 				FF2B180E1B7B20B100F00719 /* Images.xcassets */,
 				FF2B18101B7B20B100F00719 /* LaunchScreen.xib */,
@@ -120,6 +136,17 @@
 				FF2B181C1B7B20B100F00719 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		FF2B18531B80F3FA00F00719 /* MGSwipeTableCell */ = {
+			isa = PBXGroup;
+			children = (
+				FF2B18541B80F43000F00719 /* MGSwipeButton.h */,
+				FF2B18551B80F43000F00719 /* MGSwipeButton.m */,
+				FF2B18561B80F43000F00719 /* MGSwipeTableCell.h */,
+				FF2B18571B80F43000F00719 /* MGSwipeTableCell.m */,
+			);
+			name = MGSwipeTableCell;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -223,9 +250,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				FF2B18041B7B20B100F00719 /* AppDelegate.m in Sources */,
+				FF2B18591B80F43000F00719 /* MGSwipeTableCell.m in Sources */,
 				FF2B18071B7B20B100F00719 /* Notes.xcdatamodeld in Sources */,
+				FF2B18581B80F43000F00719 /* MGSwipeButton.m in Sources */,
 				FF2B180A1B7B20B100F00719 /* ViewController.m in Sources */,
 				FF2B18011B7B20B100F00719 /* main.m in Sources */,
+				FF2B185E1B8110E000F00719 /* EditorViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -351,7 +381,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Notes",
+				);
 				INFOPLIST_FILE = Notes/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -361,7 +396,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Notes",
+				);
 				INFOPLIST_FILE = Notes/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

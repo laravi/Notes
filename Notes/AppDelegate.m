@@ -7,6 +7,8 @@
 //
 
 #import "AppDelegate.h"
+#import "ViewController.h"
+#import <DropboxSDK/DropboxSDK.h>
 
 @interface AppDelegate ()
 
@@ -17,6 +19,18 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    ViewController *cont = [ViewController new];
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:cont];
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.rootViewController = navController;
+    [self.window makeKeyAndVisible];
+    
+    DBSession *dbSession = [[DBSession alloc]
+                            initWithAppKey:@"t2e0qgjxmo9inz5"
+                            appSecret:@"y9c49i1hq5htei3"
+                            root:kDBRootAppFolder];
+    [DBSession setSharedSession:dbSession];
+
     return YES;
 }
 
@@ -42,6 +56,19 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     // Saves changes in the application's managed object context before the application terminates.
     [self saveContext];
+}
+
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url
+  sourceApplication:(NSString *)source annotation:(id)annotation {
+    if ([[DBSession sharedSession] handleOpenURL:url]) {
+        if ([[DBSession sharedSession] isLinked]) {
+            NSLog(@"App linked successfully!");
+            // At this point you can start making API calls
+        }
+        return YES;
+    }
+    // Add whatever other url handling code your app requires here
+    return NO;
 }
 
 #pragma mark - Core Data stack
@@ -122,6 +149,13 @@
             abort();
         }
     }
+}
+
+#pragma mark - App doc directory
+
+- (NSString *)localDocumentsDirectory
+{
+    return NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
 }
 
 @end
