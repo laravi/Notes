@@ -19,7 +19,8 @@
     self = [super init];
     if (self) {
         self.textView = [UITextView new];
-        self.textView.text = @"test";
+        self.filePath = filepath;
+        self.textView.text = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:nil];
     }
     return self;
 }
@@ -70,11 +71,16 @@
 
 - (void)save
 {
+    if (self.textView.text.length > 0) {
+        [self.textView.text writeToFile:self.filePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        [self.delegate noteSavedWithText:self.textView.text inPath:self.filePath];
+    }
     
 }
 
 - (void)closeEditor
 {
+    [self save];
     [self.navigationController popToRootViewControllerAnimated:YES];
 }
 

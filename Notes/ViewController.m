@@ -11,7 +11,7 @@
 #import "MGSwipeTableCell.h"
 #import "MGSwipeButton.h"
 
-@interface ViewController () <UITableViewDelegate, UITableViewDataSource, DBRestClientDelegate>
+@interface ViewController () <UITableViewDelegate, UITableViewDataSource, DBRestClientDelegate, EditorDelegate>
 
 @end
 
@@ -30,6 +30,17 @@
         self.appDel = [[UIApplication sharedApplication] delegate];
     }
     return self;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    NSManagedObjectContext *managedObjectContext = [self.appDel managedObjectContext];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Notes"];
+    [fetchRequest setReturnsObjectsAsFaults:NO];
+    self.notesList = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
+    [self.tableView reloadData];
 }
 
 - (void)viewDidLoad {
@@ -77,13 +88,28 @@
                                                            constant:0]];
 }
 
+// private methods
+
 - (void)createNew
 {
     if (![[DBSession sharedSession] isLinked]) {
         [[DBSession sharedSession] linkFromController:self];
         return;
     }
-    
+    [self openEditor:[[self.appDel localDocumentsDirectory] stringByAppendingPathComponent:[self currentTimeAsString]]];
+}
+
+- (void)openEditor:(NSString *)filepath
+{
+    EditorViewController *cont = [[EditorViewController alloc] initWithFilepath:filepath];
+    cont.delegate = self;
+    [self.navigationController pushViewController:cont animated:YES];
+}
+
+- (NSString *)currentTimeAsString
+{
+    long currentTime = (long)(NSTimeInterval)([[NSDate date] timeIntervalSince1970]);
+    return [NSString stringWithFormat:@"%ld", currentTime];
 }
 
 #pragma mark Tableview Delegate
@@ -101,7 +127,8 @@
         cell = [[MGSwipeTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
     }
     
-    cell.textLabel.text = @"Notesssss";
+    NSManagedObject *note = [self.notesList objectAtIndex:indexPath.row];
+    [cell.textLabel setText:[note valueForKey:@"name"]];
     
     //configure right buttons
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"Delete" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
@@ -111,9 +138,46 @@
     return cell;
 }
 
--(void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
+    NSManagedObject *note = [self.notesList objectAtIndex:indexPath.row];
+    [self openEditor:[note valueForKey:@"filepath"]];
+}
+
+#pragma mark DataModel methods
+
+- (void)updateDataModel:(NSString *)name filePath:(NSString *)filepath
+{
+    NSManagedObject *newNote = [NSEntityDescription insertNewObjectForEntityForName:@"Notes" inManagedObjectContext:[self.appDel managedObjectContext]];
+    [newNote setValue:name forKey:@"name"];
+    [newNote setValue:filepath forKey:@"filepath"];
+    [newNote setValue:[NSNumber numberWithBool:YES] forKey:@"shouldsync"];
+    
+    NSError *error = nil;
+    // Save the object to persistent store
+    if (![[self.appDel managedObjectContext] save:&error]) {
+        NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
+    }
+}
+
+# pragma mark EditorDelegate
+
+- (void)noteSavedWithText:(NSString *)text inPath:(NSString *)filepath
+{
+    NSString *noteName;
+    NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:@"\n"
+                                                                          options:NSRegularExpressionCaseInsensitive
+                                                                            error:nil];
+    NSTextCheckingResult *res = [regex firstMatchInString:text options:NSMatchingReportCompletion range:NSMakeRange(0, text.length)];
+    if (res && (res.range.location != 0)) {
+        noteName = ([text substringToIndex:res.range.location].length >10)?[text substringToIndex:10]:[text substringToIndex:res.range.location];
+    } else {
+        (text.length > 10)?(noteName = [text substringToIndex:10]):(noteName = text);
+    }
+    
+    [self updateDataModel:noteName filePath:filepath];
 }
 
 - (void)didReceiveMemoryWarning {
