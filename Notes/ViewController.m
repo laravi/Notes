@@ -114,9 +114,23 @@
     return [NSString stringWithFormat:@"%ld", currentTime];
 }
 
-- (void)deleteNote:(NSString *)name
+- (void)deleteNote:(NSString *)filename
 {
+    NSString *path = [[self.appDel localDocumentsDirectory] stringByAppendingPathComponent:filename];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        return;
+    }
+    NSError *error;
+    if (![[NSFileManager defaultManager] removeItemAtPath:path error:&error]) {
+        NSLog(@"Can't delete! %@ %@", error, [error localizedDescription]);
+    }
+    [self removeDataModelEntry:filename];
     
+    NSManagedObjectContext *managedObjectContext = [self.appDel managedObjectContext];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Notes"];
+    [fetchRequest setReturnsObjectsAsFaults:NO];
+    self.notesList = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
+    [self.tableView reloadData];
 }
 
 #pragma mark Tableview Delegate
@@ -135,13 +149,13 @@
     }
     
     NSManagedObject *note = [self.notesList objectAtIndex:indexPath.row];
-    [cell.textLabel setText:[note valueForKey:@"name"]];
+    [cell.textLabel setText:[note valueForKey:@"title"]];
     
     //configure right buttons
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"Delete" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
         [UIAlertView showWithTitle:@"Do you really want to delete the note?" message:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Delete"] tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
             if (buttonIndex == 1) {
-                [self deleteNote:sender.textLabel.text];
+                [self deleteNote:[note valueForKey:@"filename"]];
             }
         }];
         return YES;
@@ -155,41 +169,91 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     NSManagedObject *note = [self.notesList objectAtIndex:indexPath.row];
-    [self openEditor:[note valueForKey:@"filepath"]];
+    [self openEditor:[[self.appDel localDocumentsDirectory] stringByAppendingPathComponent:[note valueForKey:@"filename"]]];
 }
 
 #pragma mark DataModel methods
 
-- (void)updateDataModel:(NSString *)name filePath:(NSString *)filepath
+- (void)updateDataModel:(NSString *)title filename:(NSString *)filename
 {
-    NSManagedObject *newNote = [NSEntityDescription insertNewObjectForEntityForName:@"Notes" inManagedObjectContext:[self.appDel managedObjectContext]];
-    [newNote setValue:name forKey:@"name"];
-    [newNote setValue:filepath forKey:@"filepath"];
-    [newNote setValue:[NSNumber numberWithBool:YES] forKey:@"shouldsync"];
+    NSManagedObjectContext *managedObjectContext = [self.appDel managedObjectContext];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Notes" inManagedObjectContext:managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@",@"filename",filename];
+    [fetchRequest setEntity:entityDescription];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setReturnsObjectsAsFaults:NO];
     
-    NSError *error = nil;
-    // Save the object to persistent store
-    if (![[self.appDel managedObjectContext] save:&error]) {
-        NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
+    NSError *error;
+    NSArray *fetchDetails = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+
+    if (fetchDetails.count == 0) {
+        NSManagedObject *newNote = [NSEntityDescription insertNewObjectForEntityForName:@"Notes" inManagedObjectContext:managedObjectContext];
+        [newNote setValue:title forKey:@"title"];
+        [newNote setValue:filename forKey:@"filename"];
+        [newNote setValue:[NSNumber numberWithBool:YES] forKey:@"shouldsync"];
+        
+        error = nil;
+        if (![[self.appDel managedObjectContext] save:&error]) {
+            NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
+        }
+    } else {
+        NSManagedObject *note = [fetchDetails firstObject];
+        [note setValue:title forKey:@"title"];
+        [note setValue:[NSNumber numberWithBool:YES] forKey:@"shouldsync"];
+        
+        error = nil;
+        if (![[self.appDel managedObjectContext] save:&error]) {
+            NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
+        }
     }
+}
+
+- (void)removeDataModelEntry:(NSString *)filename
+{
+    NSManagedObjectContext *managedObjectContext = [self.appDel managedObjectContext];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Notes" inManagedObjectContext:managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@",@"filename",filename];
+    [fetchRequest setEntity:entityDescription];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setReturnsObjectsAsFaults:NO];
+    
+    NSError *error;
+    NSArray *fetchDetails = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    
+    if (fetchDetails.count>0) {
+        NSManagedObject *note = [fetchDetails firstObject];
+        [managedObjectContext deleteObject:note];
+        error = nil;
+        if (![[self.appDel managedObjectContext] save:&error]) {
+            NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
+        }
+    }
+
 }
 
 # pragma mark EditorDelegate
 
-- (void)noteSavedWithText:(NSString *)text inPath:(NSString *)filepath
+- (void)noteSavedWithText:(NSString *)text filename:(NSString *)filename
 {
-    NSString *noteName;
+    NSString *noteTitle;
     NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:@"\n"
                                                                           options:NSRegularExpressionCaseInsensitive
                                                                             error:nil];
     NSTextCheckingResult *res = [regex firstMatchInString:text options:NSMatchingReportCompletion range:NSMakeRange(0, text.length)];
     if (res && (res.range.location != 0)) {
-        noteName = ([text substringToIndex:res.range.location].length >10)?[text substringToIndex:10]:[text substringToIndex:res.range.location];
+        noteTitle = ([text substringToIndex:res.range.location].length >10)?[text substringToIndex:10]:[text substringToIndex:res.range.location];
     } else {
-        (text.length > 10)?(noteName = [text substringToIndex:10]):(noteName = text);
+        (text.length > 10)?(noteTitle = [text substringToIndex:10]):(noteTitle = text);
     }
     
-    [self updateDataModel:noteName filePath:filepath];
+    [self updateDataModel:noteTitle filename:filename];
+}
+
+- (void)removeNote:(NSString *)filename
+{
+    [self deleteNote:filename];
 }
 
 - (void)didReceiveMemoryWarning {

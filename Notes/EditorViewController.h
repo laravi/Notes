@@ -10,7 +10,8 @@
 
 @protocol EditorDelegate <NSObject>
 
-- (void)noteSavedWithText:(NSString *)text inPath:(NSString *)filepath;
+- (void)noteSavedWithText:(NSString *)text filename:(NSString *)filename;
+- (void)removeNote:(NSString *)filename;
 
 @end
 

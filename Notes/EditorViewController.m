@@ -83,8 +83,10 @@
 {
     if (self.textView.text.length > 0 && isModified) {
         [self.textView.text writeToFile:self.filePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-        [self.delegate noteSavedWithText:self.textView.text inPath:self.filePath];
+        [self.delegate noteSavedWithText:self.textView.text filename:[self.filePath lastPathComponent]];
         isModified = NO;
+    } else if (self.textView.text.length == 0) {
+        [self.delegate removeNote:[self.filePath lastPathComponent]];
     }
     
 }
