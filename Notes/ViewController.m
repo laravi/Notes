@@ -28,6 +28,8 @@
         
         self.notesList = [NSMutableArray new];
         self.appDel = [[UIApplication sharedApplication] delegate];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(createNew) name:@"DropboxLinkedNotification" object:nil];
     }
     return self;
 }
@@ -96,7 +98,7 @@
         [[DBSession sharedSession] linkFromController:self];
         return;
     }
-    [self openEditor:[[self.appDel localDocumentsDirectory] stringByAppendingPathComponent:[self currentTimeAsString]]];
+    [self openEditor:[[[self.appDel localDocumentsDirectory] stringByAppendingPathComponent:[self currentTimeAsString]] stringByAppendingPathExtension:@"txt"]];
 }
 
 - (void)openEditor:(NSString *)filepath
@@ -110,6 +112,11 @@
 {
     long currentTime = (long)(NSTimeInterval)([[NSDate date] timeIntervalSince1970]);
     return [NSString stringWithFormat:@"%ld", currentTime];
+}
+
+- (void)deleteNote:(NSString *)name
+{
+    
 }
 
 #pragma mark Tableview Delegate
@@ -132,6 +139,11 @@
     
     //configure right buttons
     cell.rightButtons = @[[MGSwipeButton buttonWithTitle:@"Delete" backgroundColor:[UIColor redColor] callback:^BOOL(MGSwipeTableCell *sender) {
+        [UIAlertView showWithTitle:@"Do you really want to delete the note?" message:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Delete"] tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+            if (buttonIndex == 1) {
+                [self deleteNote:sender.textLabel.text];
+            }
+        }];
         return YES;
     }]];
     cell.rightSwipeSettings.transition = MGSwipeTransition3D;

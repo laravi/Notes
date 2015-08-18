@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FF1E375C1B8307F5004CC7F4 /* UIAlertView+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = FF1E375B1B8307F5004CC7F4 /* UIAlertView+Blocks.m */; };
 		FF2B18011B7B20B100F00719 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FF2B18001B7B20B100F00719 /* main.m */; };
 		FF2B18041B7B20B100F00719 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FF2B18031B7B20B100F00719 /* AppDelegate.m */; };
 		FF2B18071B7B20B100F00719 /* Notes.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FF2B18051B7B20B100F00719 /* Notes.xcdatamodeld */; };
@@ -32,6 +33,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		FF1E375A1B8307F5004CC7F4 /* UIAlertView+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+Blocks.h"; sourceTree = "<group>"; };
+		FF1E375B1B8307F5004CC7F4 /* UIAlertView+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+Blocks.m"; sourceTree = "<group>"; };
+		FF1E375D1B8309CB004CC7F4 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
 		FF2B17FB1B7B20B100F00719 /* Notes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Notes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF2B17FF1B7B20B100F00719 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FF2B18001B7B20B100F00719 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -103,6 +107,8 @@
 				FF2B18091B7B20B100F00719 /* ViewController.m */,
 				FF2B185C1B8110E000F00719 /* EditorViewController.h */,
 				FF2B185D1B8110E000F00719 /* EditorViewController.m */,
+				FF1E375A1B8307F5004CC7F4 /* UIAlertView+Blocks.h */,
+				FF1E375B1B8307F5004CC7F4 /* UIAlertView+Blocks.m */,
 				FF2B180B1B7B20B100F00719 /* Main.storyboard */,
 				FF2B180E1B7B20B100F00719 /* Images.xcassets */,
 				FF2B18101B7B20B100F00719 /* LaunchScreen.xib */,
@@ -117,6 +123,7 @@
 			children = (
 				FF2B17FF1B7B20B100F00719 /* Info.plist */,
 				FF2B18001B7B20B100F00719 /* main.m */,
+				FF1E375D1B8309CB004CC7F4 /* PrefixHeader.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -250,6 +257,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FF2B18041B7B20B100F00719 /* AppDelegate.m in Sources */,
+				FF1E375C1B8307F5004CC7F4 /* UIAlertView+Blocks.m in Sources */,
 				FF2B18591B80F43000F00719 /* MGSwipeTableCell.m in Sources */,
 				FF2B18071B7B20B100F00719 /* Notes.xcdatamodeld in Sources */,
 				FF2B18581B80F43000F00719 /* MGSwipeButton.m in Sources */,
@@ -385,6 +393,8 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Notes",
 				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Notes/PrefixHeader.pch;
 				INFOPLIST_FILE = Notes/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -400,6 +410,8 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Notes",
 				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Notes/PrefixHeader.pch;
 				INFOPLIST_FILE = Notes/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
