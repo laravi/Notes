@@ -35,11 +35,11 @@
     [super viewDidLoad];
     [self setUpKeyboardNotificationHandlers];
     
-    UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithTitle:@"Save" style:UIBarButtonItemStylePlain target:self action:@selector(save)];
-    [item setTintColor:[UIColor blackColor]];
-    self.navigationItem.rightBarButtonItem = item;
+//    UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithTitle:@"Save" style:UIBarButtonItemStylePlain target:self action:@selector(save)];
+//    [item setTintColor:[UIColor blackColor]];
+//    self.navigationItem.rightBarButtonItem = item;
     
-    item = [[UIBarButtonItem alloc] initWithTitle:@"Close" style:UIBarButtonItemStylePlain target:self action:@selector(closeEditor)];
+    UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithTitle:@"< Back" style:UIBarButtonItemStylePlain target:self action:@selector(closeEditor)];
     [item setTintColor:[UIColor blackColor]];
     self.navigationItem.leftBarButtonItem = item;
     

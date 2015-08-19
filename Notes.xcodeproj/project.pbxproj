@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		FF1E375C1B8307F5004CC7F4 /* UIAlertView+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = FF1E375B1B8307F5004CC7F4 /* UIAlertView+Blocks.m */; };
+		FF1E37601B833FDB004CC7F4 /* DropboxUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = FF1E375F1B833FDB004CC7F4 /* DropboxUtil.m */; };
 		FF2B18011B7B20B100F00719 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FF2B18001B7B20B100F00719 /* main.m */; };
 		FF2B18041B7B20B100F00719 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FF2B18031B7B20B100F00719 /* AppDelegate.m */; };
 		FF2B18071B7B20B100F00719 /* Notes.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FF2B18051B7B20B100F00719 /* Notes.xcdatamodeld */; };
@@ -20,6 +21,7 @@
 		FF2B18591B80F43000F00719 /* MGSwipeTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FF2B18571B80F43000F00719 /* MGSwipeTableCell.m */; };
 		FF2B185B1B81004300F00719 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF2B185A1B81004300F00719 /* DropboxSDK.framework */; };
 		FF2B185E1B8110E000F00719 /* EditorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FF2B185D1B8110E000F00719 /* EditorViewController.m */; };
+		FF98F7E11B84450B0015DCBA /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = FF98F7E01B84450B0015DCBA /* Reachability.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +38,8 @@
 		FF1E375A1B8307F5004CC7F4 /* UIAlertView+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+Blocks.h"; sourceTree = "<group>"; };
 		FF1E375B1B8307F5004CC7F4 /* UIAlertView+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+Blocks.m"; sourceTree = "<group>"; };
 		FF1E375D1B8309CB004CC7F4 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		FF1E375E1B833FDB004CC7F4 /* DropboxUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DropboxUtil.h; sourceTree = "<group>"; };
+		FF1E375F1B833FDB004CC7F4 /* DropboxUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DropboxUtil.m; sourceTree = "<group>"; };
 		FF2B17FB1B7B20B100F00719 /* Notes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Notes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF2B17FF1B7B20B100F00719 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FF2B18001B7B20B100F00719 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -57,6 +61,8 @@
 		FF2B185A1B81004300F00719 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DropboxSDK.framework; path = Notes/DropboxSDK.framework; sourceTree = "<group>"; };
 		FF2B185C1B8110E000F00719 /* EditorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditorViewController.h; sourceTree = "<group>"; };
 		FF2B185D1B8110E000F00719 /* EditorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditorViewController.m; sourceTree = "<group>"; };
+		FF98F7DF1B84450B0015DCBA /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		FF98F7E01B84450B0015DCBA /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,8 +113,12 @@
 				FF2B18091B7B20B100F00719 /* ViewController.m */,
 				FF2B185C1B8110E000F00719 /* EditorViewController.h */,
 				FF2B185D1B8110E000F00719 /* EditorViewController.m */,
+				FF1E375E1B833FDB004CC7F4 /* DropboxUtil.h */,
+				FF1E375F1B833FDB004CC7F4 /* DropboxUtil.m */,
 				FF1E375A1B8307F5004CC7F4 /* UIAlertView+Blocks.h */,
 				FF1E375B1B8307F5004CC7F4 /* UIAlertView+Blocks.m */,
+				FF98F7DF1B84450B0015DCBA /* Reachability.h */,
+				FF98F7E01B84450B0015DCBA /* Reachability.m */,
 				FF2B180B1B7B20B100F00719 /* Main.storyboard */,
 				FF2B180E1B7B20B100F00719 /* Images.xcassets */,
 				FF2B18101B7B20B100F00719 /* LaunchScreen.xib */,
@@ -260,7 +270,9 @@
 				FF1E375C1B8307F5004CC7F4 /* UIAlertView+Blocks.m in Sources */,
 				FF2B18591B80F43000F00719 /* MGSwipeTableCell.m in Sources */,
 				FF2B18071B7B20B100F00719 /* Notes.xcdatamodeld in Sources */,
+				FF98F7E11B84450B0015DCBA /* Reachability.m in Sources */,
 				FF2B18581B80F43000F00719 /* MGSwipeButton.m in Sources */,
+				FF1E37601B833FDB004CC7F4 /* DropboxUtil.m in Sources */,
 				FF2B180A1B7B20B100F00719 /* ViewController.m in Sources */,
 				FF2B18011B7B20B100F00719 /* main.m in Sources */,
 				FF2B185E1B8110E000F00719 /* EditorViewController.m in Sources */,

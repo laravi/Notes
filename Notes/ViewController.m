@@ -10,13 +10,18 @@
 #import "EditorViewController.h"
 #import "MGSwipeTableCell.h"
 #import "MGSwipeButton.h"
+#import "DropboxUtil.h"
 
-@interface ViewController () <UITableViewDelegate, UITableViewDataSource, DBRestClientDelegate, EditorDelegate>
+#import <DropboxSDK/DropboxSDK.h>
+
+@interface ViewController () <UITableViewDelegate, UITableViewDataSource, EditorDelegate>
 
 @end
 
 @implementation ViewController
-
+{
+    DropboxUtil *util;
+}
 
 -(id)init
 {
@@ -48,9 +53,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.restClient = [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
-    self.restClient.delegate = self;
-
     UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithTitle:@"New" style:UIBarButtonItemStylePlain target:self action:@selector(createNew)];
     [item setTintColor:[UIColor blackColor]];
     self.navigationItem.rightBarButtonItem = item;
@@ -133,6 +135,29 @@
     [self.tableView reloadData];
 }
 
+- (NSString *)getUniqueTitle:(NSString *)title
+{
+    int i = 0;
+    NSUInteger titleCount;
+    NSString *newTitle;
+    do {
+        i++;
+        newTitle = [title stringByAppendingFormat:@"-%d",i];
+        
+        NSManagedObjectContext *managedObjectContext = [self.appDel managedObjectContext];
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Notes" inManagedObjectContext:managedObjectContext];
+        NSError *error;
+        
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@",@"title",newTitle];
+        [fetchRequest setEntity:entityDescription];
+        [fetchRequest setPredicate:predicate];
+        [fetchRequest setReturnsObjectsAsFaults:NO];
+        titleCount = [managedObjectContext countForFetchRequest:fetchRequest error:&error];
+    } while (titleCount>0);
+    return newTitle;
+}
+
 #pragma mark Tableview Delegate
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -179,33 +204,60 @@
     NSManagedObjectContext *managedObjectContext = [self.appDel managedObjectContext];
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Notes" inManagedObjectContext:managedObjectContext];
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@",@"filename",filename];
+    NSError *error;
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@",@"title",title];
     [fetchRequest setEntity:entityDescription];
     [fetchRequest setPredicate:predicate];
     [fetchRequest setReturnsObjectsAsFaults:NO];
+    NSUInteger titleCount = [managedObjectContext countForFetchRequest:fetchRequest error:&error];
     
-    NSError *error;
+    predicate = [NSPredicate predicateWithFormat:@"%K == %@",@"filename",filename];
+    fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:entityDescription];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setReturnsObjectsAsFaults:NO];
     NSArray *fetchDetails = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
 
+    NSManagedObject *obj;
+    NSString *oldTitle;
     if (fetchDetails.count == 0) {
-        NSManagedObject *newNote = [NSEntityDescription insertNewObjectForEntityForName:@"Notes" inManagedObjectContext:managedObjectContext];
-        [newNote setValue:title forKey:@"title"];
-        [newNote setValue:filename forKey:@"filename"];
-        [newNote setValue:[NSNumber numberWithBool:YES] forKey:@"shouldsync"];
+        //New note
+        if (titleCount>0) {
+            title = [self getUniqueTitle:title];
+        }
+        obj = [NSEntityDescription insertNewObjectForEntityForName:@"Notes" inManagedObjectContext:managedObjectContext];
+        [obj setValue:title forKey:@"title"];
+        [obj setValue:filename forKey:@"filename"];
+        [obj setValue:nil forKey:@"rev"];
+        [obj setValue:[NSNumber numberWithBool:YES] forKey:@"shouldsync"];
         
         error = nil;
         if (![[self.appDel managedObjectContext] save:&error]) {
             NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
         }
     } else {
-        NSManagedObject *note = [fetchDetails firstObject];
-        [note setValue:title forKey:@"title"];
-        [note setValue:[NSNumber numberWithBool:YES] forKey:@"shouldsync"];
+        //Update note
+        obj = [fetchDetails firstObject];
+        if (titleCount == 1 && ![[obj valueForKey:@"title"] isEqualToString:title]) {
+            title = [self getUniqueTitle:title];
+        }
+        if (![[obj valueForKey:@"title"] isEqualToString:title]) {
+            oldTitle = [obj valueForKey:@"title"];
+        }
+        [obj setValue:title forKey:@"title"];
+        [obj setValue:[NSNumber numberWithBool:YES] forKey:@"shouldsync"];
         
         error = nil;
         if (![[self.appDel managedObjectContext] save:&error]) {
             NSLog(@"Can't Save! %@ %@", error, [error localizedDescription]);
         }
+    }
+    util = [[DropboxUtil alloc] initWithobject:obj];
+    if (oldTitle) {
+        [util moveNote:oldTitle];
+    } else {
+        [util saveNote];
     }
 }
 
@@ -224,6 +276,8 @@
     
     if (fetchDetails.count>0) {
         NSManagedObject *note = [fetchDetails firstObject];
+        util = [[DropboxUtil alloc] initWithobject:nil];
+        [util deleteNote:[note valueForKey:@"title"]];
         [managedObjectContext deleteObject:note];
         error = nil;
         if (![[self.appDel managedObjectContext] save:&error]) {
@@ -237,15 +291,16 @@
 
 - (void)noteSavedWithText:(NSString *)text filename:(NSString *)filename
 {
+    NSString *txt = [text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSString *noteTitle;
     NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:@"\n"
                                                                           options:NSRegularExpressionCaseInsensitive
                                                                             error:nil];
-    NSTextCheckingResult *res = [regex firstMatchInString:text options:NSMatchingReportCompletion range:NSMakeRange(0, text.length)];
-    if (res && (res.range.location != 0)) {
-        noteTitle = ([text substringToIndex:res.range.location].length >10)?[text substringToIndex:10]:[text substringToIndex:res.range.location];
+    NSTextCheckingResult *res = [regex firstMatchInString:txt options:NSMatchingReportCompletion range:NSMakeRange(0, txt.length)];
+    if (res) {
+        noteTitle = ([txt substringToIndex:res.range.location].length >10)?[txt substringToIndex:10]:[txt substringToIndex:res.range.location];
     } else {
-        (text.length > 10)?(noteTitle = [text substringToIndex:10]):(noteTitle = text);
+        (txt.length > 10)?(noteTitle = [txt substringToIndex:10]):(noteTitle = txt);
     }
     
     [self updateDataModel:noteTitle filename:filename];

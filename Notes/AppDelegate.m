@@ -10,7 +10,7 @@
 #import "ViewController.h"
 #import <DropboxSDK/DropboxSDK.h>
 
-@interface AppDelegate ()
+@interface AppDelegate () <DBSessionDelegate, DBNetworkRequestDelegate>
 
 @end
 
@@ -30,7 +30,15 @@
                             appSecret:@"y9c49i1hq5htei3"
                             root:kDBRootAppFolder];
     [DBSession setSharedSession:dbSession];
+    [DBRequest setNetworkRequestDelegate:self];
 
+    // Preloads keyboard so there's no lag on initial keyboard appearance.
+    UITextField *lagFreeField = [[UITextField alloc] init];
+    [self.window addSubview:lagFreeField];
+    [lagFreeField becomeFirstResponder];
+    [lagFreeField resignFirstResponder];
+    [lagFreeField removeFromSuperview];
+    
     return YES;
 }
 
@@ -159,5 +167,31 @@
 {
     return NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
 }
+
+static int outstandingRequests;
+
+
+- (void)networkRequestStarted {
+    outstandingRequests++;
+    if (outstandingRequests == 1) {
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    }
+}
+
+- (void)networkRequestStopped {
+    outstandingRequests--;
+    if (outstandingRequests == 0) {
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    }
+}
+
+- (void)sessionDidReceiveAuthorizationFailure:(DBSession*)session userId:(NSString *)userId {
+    //	relinkUserId = [userId retain];
+    [[[UIAlertView alloc]
+      initWithTitle:@"Dropbox Session Ended" message:@"\n Do you want to relink?" delegate:self
+      cancelButtonTitle:@"Cancel" otherButtonTitles:@"Relink", nil]
+     show];
+}
+
 
 @end
